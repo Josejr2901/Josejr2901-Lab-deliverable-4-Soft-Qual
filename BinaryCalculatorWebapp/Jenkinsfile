@@ -3,6 +3,13 @@ pipeline {
   tools {
     maven 'maven' 
   }
+  environment {
+    // Define environment variables
+    PROJECT_ID = 'advance-totem-416000'
+    IMAGE = 'gcr.io/$PROJECT_ID/binary-calculator'
+    DEPLOYMENT_NAME = 'binary-calculator-deployment'
+    KUBECONFIG_CREDENTIALS_ID = 'GitHub_token.' 
+  }
   stages {
     stage ('Init') {
       steps {
@@ -10,20 +17,43 @@ pipeline {
         sh 'ls -la'
       }
     }
-    stage ('test') {
+    stage ('Test') {
       steps {
         sh 'mvn clean test -f ./BinaryCalculatorWebapp/pom.xml'
       }
     }
-    stage ('build') {
+    stage ('Build and Push Image') {
       steps {
-        sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
+        script {
+          // Build the Docker image
+          sh 'docker build -t $IMAGE:$BUILD_ID .'
+          
+          // Authenticate with Google Cloud
+          sh 'gcloud auth configure-docker'
+
+          // Push the Docker image to Google Container Registry
+          sh 'docker push $IMAGE:$BUILD_ID'
+        }
       }
     }
-    stage ('Deploy') {
+    stage ('Deploy to GKE') {
       steps {
-        sh 'echo "bye bye"'
+        script {
+          // Set the Kubernetes context to your GKE cluster
+          sh 'gcloud container clusters get-credentials sofe3980u --zone northamerica-northeast1-b --project $PROJECT_ID'
+          
+          // Use kubectl to set the image in the deployment to the new image
+          sh 'kubectl set image deployment/$DEPLOYMENT_NAME binary-calculator=$IMAGE:$BUILD_ID'
+        }
       }
+    }
+  }
+  post {
+    success {
+      sh 'echo "Deployment succeeded!"'
+    }
+    failure {
+      sh 'echo "Deployment failed."'
     }
   }
 }
