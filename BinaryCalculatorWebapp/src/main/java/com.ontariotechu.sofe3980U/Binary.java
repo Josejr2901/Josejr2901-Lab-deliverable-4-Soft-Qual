@@ -1,6 +1,10 @@
 package com.ontariotechu.sofe3980U;
 
 /**
+ Jose Martinez - 100763170
+ */
+
+/**
  * Unsigned integer Binary variable
  *
  */
@@ -12,6 +16,10 @@ public class Binary
 	*
 	* @param number a String of the binary values. It should conatins only zeros or ones with any length and order. otherwise, the value of "0" will be stored.   Trailing zeros will be excluded and empty string will be considered as zero.
 	*/
+
+
+
+
     public Binary(String number) {
 		for (int i = 0; i < number.length(); i++) {
 			// check each character if it's not 0 or 1
@@ -31,8 +39,15 @@ public class Binary
 		this.number=number.substring(beg); // exclude the trailing zeros if any
 		// uncomment the following code
 		
-		if(this.number=="") { // replace empty strings with a single zero
-			this.number="0";
+		if (this.number.isEmpty()) { // replace empty strings with a single zero
+			if(number == ""){
+				this.number="0";
+				return;
+			}
+			for(int j = 0; j < number.length(); j++){
+				this.number = this.number + "0";
+			}
+			
 		}
 		
     }
@@ -79,4 +94,99 @@ public class Binary
 		return result;
 		
 	}
+
+	/**
+ 	* Multiplies two Binary objects using bitwise multiplication.
+ 	*
+ 	* @param num1 The multiplicand object
+	 * @param num2 The multiplier object
+ 	* @return A Binary object representing the result of <i>num1 * num2</i>.
+ 	*/
+	public static Binary multiply(Binary num1, Binary num2) {
+    	// Initialize variables
+    	String result = "0"; // The binary value of the product
+
+    	// Iterate through each bit of the multiplier
+    	for (int i = num2.number.length() - 1; i >= 0; i--) {
+        	int bit2 = (num2.number.charAt(i) == '1') ? 1 : 0;
+
+        	// Add the shifted multiplicand to the result if the current bit is 1
+        	if (bit2 == 1) {
+           	 	result = Binary.add(new Binary(result), new Binary(num1.number)).number;
+        	}
+
+        	// Shift the multiplicand to the left
+        	num1.number = num1.number + "0";
+    	}
+
+    Binary multiplyResult = new Binary(result); // Create a Binary object with the calculated value
+    return multiplyResult;
+}
+
+	/**
+ 	* Performs bitwise OR operation on two Binary objects.
+ 	*
+ 	* @param num1 The first operand object
+ 	* @param num2 The second operand object
+ 	* @return A Binary object representing the result of <i>num1 OR num2</i>.
+ 	*/
+	public static Binary or(Binary num1, Binary num2) {
+    	// Indices of the first digit of each number
+    	int ind1 = num1.number.length() - 1;
+    	int ind2 = num2.number.length() - 1;
+
+    	// Initial variables
+    	String result = ""; // The binary value of the bitwise OR
+
+    	while (ind1 >= 0 || ind2 >= 0) { // Loop until all digits are processed
+        	int bit1 = (ind1 >= 0) ? (num1.number.charAt(ind1) == '1' ? 1 : 0) : 0;
+        	int bit2 = (ind2 >= 0) ? (num2.number.charAt(ind2) == '1' ? 1 : 0) : 0;
+
+        	// Perform bitwise OR and update indices
+        	int orResult = bit1 | bit2;
+        	ind1--;
+        	ind2--;
+
+        	// Convert the result to string and prepend it to the final result
+        	result = ((orResult == 0) ? "0" : "1") + result;
+    	}
+
+    	Binary ORResult = new Binary(result); // Create a Binary object with the calculated value
+    	return ORResult;
+	}
+
+
+	/**
+ 	* Performs bitwise AND operation on two Binary objects.
+ 	*
+ 	* @param num1 The first operand object
+ 	* @param num2 The second operand object
+ 	* @return A Binary object representing the result of <i>num1 AND num2</i>.
+ 	*/
+	public static Binary and(Binary num1, Binary num2) {
+    	// Indices of the first digit of each number
+    	int ind1 = num1.number.length() - 1;
+    	int ind2 = num2.number.length() - 1;
+
+    	// Initial variables
+    	String result = ""; // The binary value of the bitwise AND
+
+    	while (ind1 >= 0 && ind2 >= 0) { // Loop 
+        	int bit1 = (num1.number.charAt(ind1) == '1') ? 1 : 0;
+        	int bit2 = (num2.number.charAt(ind2) == '1') ? 1 : 0;
+
+        	// Perform bitwise AND and update indices
+        	int andResult = bit1 & bit2;
+        	ind1--;
+        	ind2--;
+
+        	// Convert the result to string and prepend it to the final result
+        	result = ((andResult == 0) ? "0" : "1") + result;
+    	}
+
+    	Binary ANDResult = new Binary(result); // Create a Binary object with the calculated value
+    	return ANDResult;
+	}
+
+
 }	
